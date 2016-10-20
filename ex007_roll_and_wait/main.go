@@ -3,29 +3,35 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"strconv"
 	"time"
 )
 
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
-	go play("Tom")
-	go play("Chris")
+	p1 := Player{"Tom", 0}
+	p2 := Player{"Alex", 0}
+	go play(p1)
+	go play(p2)
 	time.Sleep(30 * time.Second)
 	fmt.Println("Game is over")
 }
 
-func play(playerName string) {
-	fmt.Println(playerName + " is ready to play")
-	totalScore := 0
+func play(player Player) {
+	fmt.Println(player.Name + " is ready to play")
 	for {
-		totalScore = rollTheDie(totalScore, playerName)
+		player.Score = rollTheDie(player)
 	}
 }
 
-func rollTheDie(totalScore int, playerName string) int {
+func rollTheDie(player Player) int {
 	randomNumber := rand.Intn(6) + 1
-	fmt.Println(playerName + " (" + strconv.Itoa(totalScore) + ")  rolled a " + strconv.Itoa(randomNumber))
-	time.Sleep(time.Duration(6-randomNumber) * time.Second)
-	return totalScore + randomNumber
+	secondsToSleep := 6 - randomNumber
+	fmt.Printf("%s (%d) rolled a %d, waiting %d sec\n", player.Name, player.Score, randomNumber, secondsToSleep)
+	time.Sleep(time.Duration(secondsToSleep) * time.Second)
+	return player.Score + randomNumber
+}
+
+type Player struct {
+	Name  string
+	Score int
 }
